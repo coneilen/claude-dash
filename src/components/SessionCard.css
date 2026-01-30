@@ -1,0 +1,229 @@
+.session-card {
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%);
+  border: 1px solid rgba(102, 126, 234, 0.2);
+  border-radius: 12px;
+  padding: 1.5rem;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.session-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(102, 126, 234, 0.2);
+  border-color: rgba(102, 126, 234, 0.4);
+}
+
+.session-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1rem;
+  gap: 1rem;
+}
+
+.session-title {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #e0e0e0;
+  line-height: 1.4;
+  flex: 1;
+  word-break: break-word;
+}
+
+.session-status {
+  padding: 0.25rem 0.75rem;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.session-status.active {
+  background: rgba(76, 175, 80, 0.2);
+  color: #4caf50;
+  border: 1px solid rgba(76, 175, 80, 0.3);
+}
+
+.machine-badge {
+  display: inline-block;
+  padding: 0.4rem 0.8rem;
+  background: rgba(255, 152, 0, 0.15);
+  border: 1px solid rgba(255, 152, 0, 0.3);
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #ffa726;
+  margin-bottom: 1rem;
+  font-family: 'Courier New', monospace;
+}
+
+.context-usage {
+  margin-bottom: 1rem;
+  padding: 0.75rem;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 8px;
+}
+
+.context-label {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+  font-size: 0.85rem;
+  color: #aaa;
+}
+
+.message-count {
+  font-weight: 600;
+  color: #667eea;
+  font-family: 'Courier New', monospace;
+}
+
+.context-bar {
+  height: 6px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.context-fill {
+  height: 100%;
+  transition: width 0.3s ease;
+  border-radius: 3px;
+}
+
+.context-fill.low {
+  background: linear-gradient(90deg, #4caf50 0%, #66bb6a 100%);
+}
+
+.context-fill.medium {
+  background: linear-gradient(90deg, #ffa726 0%, #ffb74d 100%);
+}
+
+.context-fill.high {
+  background: linear-gradient(90deg, #ef5350 0%, #e57373 100%);
+}
+
+.session-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin: 1rem 0;
+}
+
+.session-info-row {
+  display: flex;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+  align-items: baseline;
+}
+
+.session-info-row .label {
+  color: #888;
+  font-weight: 500;
+  min-width: 90px;
+  flex-shrink: 0;
+}
+
+.session-info-row .value {
+  color: #ccc;
+  word-break: break-word;
+  flex: 1;
+}
+
+.session-info-row .value.activity {
+  color: #667eea;
+  font-weight: 500;
+}
+
+.session-info-row .value.repo {
+  color: #ffa726;
+  font-family: 'Courier New', monospace;
+}
+
+.session-info-row .value.branch {
+  color: #66bb6a;
+  font-family: 'Courier New', monospace;
+}
+
+.session-info-row .value.workspace {
+  font-family: 'Courier New', monospace;
+  font-size: 0.85rem;
+  color: #999;
+}
+
+.session-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  font-size: 0.8rem;
+  color: #666;
+}
+
+.session-id {
+  font-family: 'Courier New', monospace;
+  color: #555;
+}
+
+.last-active {
+  color: #777;
+}
+
+@media (prefers-color-scheme: light) {
+  .session-card {
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.08) 0%, rgba(118, 75, 162, 0.08) 100%);
+    border: 1px solid rgba(102, 126, 234, 0.3);
+  }
+
+  .session-title {
+    color: #2c3e50;
+  }
+
+  .session-info-row .label {
+    color: #666;
+  }
+
+  .session-info-row .value {
+    color: #444;
+  }
+
+  .session-info-row .value.workspace {
+    color: #555;
+  }
+
+  .session-footer {
+    border-top: 1px solid rgba(0, 0, 0, 0.1);
+  }
+
+  .last-active {
+    color: #666;
+  }
+
+  .session-id {
+    color: #888;
+  }
+
+  .machine-badge {
+    background: rgba(255, 152, 0, 0.2);
+    border-color: rgba(255, 152, 0, 0.4);
+    color: #f57c00;
+  }
+
+  .context-usage {
+    background: rgba(0, 0, 0, 0.05);
+  }
+
+  .context-label {
+    color: #666;
+  }
+
+  .context-bar {
+    background: rgba(0, 0, 0, 0.1);
+  }
+}
