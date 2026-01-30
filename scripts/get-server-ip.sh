@@ -6,17 +6,17 @@ echo "================================="
 echo ""
 
 if [[ "$OSTYPE" == "darwin"* ]]; then
-  # macOS
-  echo "Available network interfaces:"
-  ifconfig | grep -A 1 "en0\|en1" | grep "inet " | grep -v 127.0.0.1 | awk '{print $2}'
+  # macOS - Show all non-loopback IPv4 addresses
+  echo "Available IP addresses:"
+  ifconfig | grep "inet " | grep -v "127.0.0.1" | awk '{print "  " $2}'
 elif [[ "$OSTYPE" == "linux-gnu"* ]]; then
   # Linux
-  echo "Available network interfaces:"
-  ip addr show | grep "inet " | grep -v 127.0.0.1 | awk '{print $2}' | cut -d/ -f1
+  echo "Available IP addresses:"
+  ip addr show | grep "inet " | grep -v "127.0.0.1" | awk '{print "  " $2}' | cut -d/ -f1
 else
   # Windows (in Git Bash or WSL)
-  echo "Available network interfaces:"
-  ipconfig | grep "IPv4" | awk '{print $NF}'
+  echo "Available IP addresses:"
+  ipconfig | grep "IPv4" | awk '{print "  " $NF}'
 fi
 
 echo ""
