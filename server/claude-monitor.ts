@@ -138,13 +138,17 @@ function isProcessRunning(pid: number): boolean {
       // On Windows, use tasklist to check if process exists
       const { execSync } = require('child_process')
       const output = execSync(`tasklist /FI "PID eq ${pid}" /NH`, { encoding: 'utf-8' })
-      return output.toLowerCase().includes('node') || output.toLowerCase().includes('code')
+      console.log(`[claude-monitor] Process check for PID ${pid}:`, output.trim().substring(0, 60))
+      const isRunning = output.toLowerCase().includes('node') || output.toLowerCase().includes('code')
+      console.log(`[claude-monitor] PID ${pid} running: ${isRunning}`)
+      return isRunning
     } else {
       // On Unix-like systems, send signal 0 to check if process exists
       process.kill(pid, 0)
       return true
     }
-  } catch {
+  } catch (e) {
+    console.log(`[claude-monitor] Process check failed for PID ${pid}:`, e instanceof Error ? e.message : e)
     return false
   }
 }
