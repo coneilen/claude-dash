@@ -119,9 +119,16 @@ async function readLockFiles(): Promise<LockFile[]> {
 
 function isProcessRunning(pid: number): boolean {
   try {
-    // Send signal 0 to check if process exists without actually sending a signal
-    process.kill(pid, 0)
-    return true
+    if (process.platform === 'win32') {
+      // On Windows, use tasklist to check if process exists
+      const { execSync } = require('child_process')
+      const output = execSync(`tasklist /FI "PID eq ${pid}" /NH`, { encoding: 'utf-8' })
+      return output.toLowerCase().includes('node') || output.toLowerCase().includes('code')
+    } else {
+      // On Unix-like systems, send signal 0 to check if process exists
+      process.kill(pid, 0)
+      return true
+    }
   } catch {
     return false
   }

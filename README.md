@@ -55,14 +55,30 @@ Open http://localhost:5173 - monitors only this machine's sessions.
 
 **Server machine:**
 ```bash
-npm run dev:all                    # Start server + dashboard
-./scripts/get-server-ip.sh         # Get your IP (e.g., 192.168.1.10)
+npm run dev:all        # Start server + dashboard
+npm run server-ip      # Get your IP (e.g., 192.168.1.10)
 ```
 
 **Each client machine:**
+
+Mac/Linux:
 ```bash
 npm install
 SERVER_URL=http://192.168.1.10:3001 npm run agent
+```
+
+Windows (PowerShell):
+```powershell
+npm install
+$env:SERVER_URL="http://192.168.1.10:3001"
+npm run agent
+```
+
+Windows (Command Prompt):
+```cmd
+npm install
+set SERVER_URL=http://192.168.1.10:3001
+npm run agent
 ```
 
 Open http://192.168.1.10:5173 on any machine to see all sessions!
@@ -91,10 +107,16 @@ The server automatically monitors local Claude sessions on this machine.
 npm run dev:server
 ```
 
-2. Note the server's local IP address:
+2. Find your server's local IP address:
+
+**Cross-platform (recommended):**
 ```bash
-ifconfig | grep "inet " | grep -v 127.0.0.1
+npm run server-ip
 ```
+
+**Or manually:**
+- Mac/Linux: `ifconfig | grep "inet " | grep -v 127.0.0.1`
+- Windows: `ipconfig | findstr IPv4`
 
 3. Open the dashboard in your browser:
 ```bash
@@ -111,16 +133,25 @@ npm run dev:all
 1. Install claude-dash on the machine (clone this repo)
 2. Install dependencies: `npm install`
 3. Configure the agent to point to your server:
-```bash
-# Set the server URL (replace <server-ip> with actual IP)
-export SERVER_URL=http://<server-ip>:3001
 
-# Optional: Set custom machine name
-export MACHINE_NAME=my-laptop
+**Mac/Linux:**
+```bash
+export SERVER_URL=http://<server-ip>:3001
+export MACHINE_NAME=my-laptop  # Optional
+npm run agent
 ```
 
-4. Run the agent:
-```bash
+**Windows (PowerShell):**
+```powershell
+$env:SERVER_URL="http://<server-ip>:3001"
+$env:MACHINE_NAME="my-laptop"  # Optional
+npm run agent
+```
+
+**Windows (Command Prompt):**
+```cmd
+set SERVER_URL=http://<server-ip>:3001
+set MACHINE_NAME=my-laptop
 npm run agent
 ```
 

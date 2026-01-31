@@ -23,18 +23,15 @@ This starts:
 
 ### 2. Find Your Server's IP Address
 
+**Recommended (cross-platform):**
 ```bash
-./scripts/get-server-ip.sh
+npm run server-ip
 ```
 
-Or manually:
-```bash
-# macOS
-ifconfig | grep "inet " | grep -v 127.0.0.1
-
-# Linux
-ip addr show | grep "inet " | grep -v 127.0.0.1
-```
+**Or manually:**
+- Mac: `ifconfig | grep "inet " | grep -v 127.0.0.1`
+- Linux: `ip addr show | grep "inet " | grep -v 127.0.0.1`
+- Windows: `ipconfig | findstr IPv4`
 
 You'll see something like `192.168.1.10` - this is your server IP.
 
@@ -58,16 +55,26 @@ npm install
 
 ### 2. Configure the Agent
 
+**Mac/Linux:**
 ```bash
-# Replace <server-ip> with the IP from Step 2 above
 export SERVER_URL=http://<server-ip>:3001
-
-# Optional: Set a custom machine name
-export MACHINE_NAME=my-laptop
+export MACHINE_NAME=my-laptop  # Optional
 ```
 
-Or create `agent/.env` file:
-```bash
+**Windows (PowerShell):**
+```powershell
+$env:SERVER_URL="http://<server-ip>:3001"
+$env:MACHINE_NAME="my-laptop"  # Optional
+```
+
+**Windows (Command Prompt):**
+```cmd
+set SERVER_URL=http://<server-ip>:3001
+set MACHINE_NAME=my-laptop
+```
+
+**Or create `agent/.env` file (all platforms):**
+```
 SERVER_URL=http://192.168.1.10:3001
 MACHINE_NAME=my-laptop
 ```
