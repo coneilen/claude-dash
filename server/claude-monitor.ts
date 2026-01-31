@@ -15,13 +15,6 @@ function normalizePath(p: string): string {
   return process.platform === 'win32' ? p.toLowerCase() : p
 }
 
-interface SessionMap {
-  [authToken: string]: {
-    lockFile: LockFile
-    workspaceFolder: string
-  }
-}
-
 export async function getActiveSessions(): Promise<LocalSession[]> {
   try {
     // Read all lock files to find active sessions
@@ -32,65 +25,62 @@ export async function getActiveSessions(): Promise<LocalSession[]> {
     const historyMap = await readHistory()
     const sessionMessageCounts = await getSessionMessageCounts()
     console.log(`[claude-monitor] History map has ${historyMap.size} workspace(s)`)
+    if (historyMap.size > 0) {
+      console.log(`[claude-monitor] History workspaces:`, Array.from(historyMap.keys()))
+    }
     console.log(`[claude-monitor] Session message counts: ${sessionMessageCounts.size} session(s)`)
 
-    // Build session map indexed by workspace folder
-    const sessionMap: SessionMap = {}
-    for (const lockFile of lockFiles) {
-      for (const workspace of lockFile.workspaceFolders) {
-        console.log(`[claude-monitor] Processing workspace: ${workspace}`)
-        sessionMap[lockFile.authToken] = {
-          lockFile,
-          workspaceFolder: workspace
-        }
-      }
-    }
-    console.log(`[claude-monitor] Session map has ${Object.keys(sessionMap).length} entry/entries`)
-
-    // Build LocalSession objects
+    // Build LocalSession objects - one per (lockFile, workspace) pair
     const sessions: LocalSession[] = []
 
-    for (const [authToken, sessionData] of Object.entries(sessionMap)) {
-      const { lockFile, workspaceFolder } = sessionData
+    for (const lockFile of lockFiles) {
+      for (const workspaceFolder of lockFile.workspaceFolders) {
+        console.log(`[claude-monitor] Processing workspace: ${workspaceFolder}`)
 
-      // Find the most recent history entry for this workspace
-      // Use normalized path for case-insensitive lookup on Windows
-      const normalizedWorkspace = normalizePath(workspaceFolder)
-      console.log(`[claude-monitor] Looking up workspace: ${workspaceFolder}`)
-      console.log(`[claude-monitor] Normalized to: ${normalizedWorkspace}`)
-      const workspaceHistory = historyMap.get(normalizedWorkspace) || []
-      console.log(`[claude-monitor] Found ${workspaceHistory.length} history entries for this workspace`)
-      const mostRecentEntry = workspaceHistory[workspaceHistory.length - 1]
-      if (mostRecentEntry) {
-        console.log(`[claude-monitor] Most recent entry title: "${mostRecentEntry.display.substring(0, 50)}"`)
+        // Find the most recent history entry for this workspace
+        // Use normalized path for case-insensitive lookup on Windows
+        const normalizedWorkspace = normalizePath(workspaceFolder)
+        console.log(`[claude-monitor] Looking up workspace: ${workspaceFolder}`)
+        console.log(`[claude-monitor] Normalized to: ${normalizedWorkspace}`)
+        const workspaceHistory = historyMap.get(normalizedWorkspace) || []
+        console.log(`[claude-monitor] Found ${workspaceHistory.length} history entry/entries for this workspace`)
+        const mostRecentEntry = workspaceHistory[workspaceHistory.length - 1]
+        if (mostRecentEntry) {
+          console.log(`[claude-monitor] ✓ Session ID: ${mostRecentEntry.sessionId}`)
+          console.log(`[claude-monitor] ✓ Title: "${mostRecentEntry.display.substring(0, 50)}"`)
+        } else {
+          console.log(`[claude-monitor] ⚠ No history found - will use default title "New Session"`)
+        }
+
+        // Get git info
+        const gitInfo = await getGitInfo(workspaceFolder)
+
+        // Get current activity from debug logs
+        const currentActivity = await getCurrentActivity(mostRecentEntry?.sessionId)
+
+        // Get message count for this session
+        const sessionId = mostRecentEntry?.sessionId || lockFile.authToken
+        const messageCount = sessionMessageCounts.get(sessionId) || 0
+
+        const session: LocalSession = {
+          sessionId,
+          title: mostRecentEntry?.display || 'New Session',
+          workspaceFolder,
+          gitRepo: gitInfo.repoName,
+          gitBranch: gitInfo.branch,
+          currentActivity,
+          lastActive: mostRecentEntry?.timestamp || Date.now(),
+          isActive: true,
+          ideName: lockFile.ideName,
+          pid: lockFile.pid,
+          messageCount
+        }
+
+        sessions.push(session)
       }
-
-      // Get git info
-      const gitInfo = await getGitInfo(workspaceFolder)
-
-      // Get current activity from debug logs
-      const currentActivity = await getCurrentActivity(mostRecentEntry?.sessionId)
-
-      // Get message count for this session
-      const sessionId = mostRecentEntry?.sessionId || authToken
-      const messageCount = sessionMessageCounts.get(sessionId) || 0
-
-      const session: LocalSession = {
-        sessionId,
-        title: mostRecentEntry?.display || 'New Session',
-        workspaceFolder,
-        gitRepo: gitInfo.repoName,
-        gitBranch: gitInfo.branch,
-        currentActivity,
-        lastActive: mostRecentEntry?.timestamp || Date.now(),
-        isActive: true,
-        ideName: lockFile.ideName,
-        pid: lockFile.pid,
-        messageCount
-      }
-
-      sessions.push(session)
     }
+
+    console.log(`[claude-monitor] Created ${sessions.length} session(s) from ${lockFiles.length} lock file(s)`)
 
     // Sort by last active (most recent first)
     sessions.sort((a, b) => b.lastActive - a.lastActive)
