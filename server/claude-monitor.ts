@@ -25,21 +25,26 @@ export async function getActiveSessions(): Promise<LocalSession[]> {
   try {
     // Read all lock files to find active sessions
     const lockFiles = await readLockFiles()
+    console.log(`[claude-monitor] Found ${lockFiles.length} active lock file(s)`)
 
     // Read history to get session titles and message counts
     const historyMap = await readHistory()
     const sessionMessageCounts = await getSessionMessageCounts()
+    console.log(`[claude-monitor] History map has ${historyMap.size} workspace(s)`)
+    console.log(`[claude-monitor] Session message counts: ${sessionMessageCounts.size} session(s)`)
 
     // Build session map indexed by workspace folder
     const sessionMap: SessionMap = {}
     for (const lockFile of lockFiles) {
       for (const workspace of lockFile.workspaceFolders) {
+        console.log(`[claude-monitor] Processing workspace: ${workspace}`)
         sessionMap[lockFile.authToken] = {
           lockFile,
           workspaceFolder: workspace
         }
       }
     }
+    console.log(`[claude-monitor] Session map has ${Object.keys(sessionMap).length} entry/entries`)
 
     // Build LocalSession objects
     const sessions: LocalSession[] = []
@@ -50,7 +55,10 @@ export async function getActiveSessions(): Promise<LocalSession[]> {
       // Find the most recent history entry for this workspace
       // Use normalized path for case-insensitive lookup on Windows
       const normalizedWorkspace = normalizePath(workspaceFolder)
+      console.log(`[claude-monitor] Looking up workspace: ${workspaceFolder}`)
+      console.log(`[claude-monitor] Normalized to: ${normalizedWorkspace}`)
       const workspaceHistory = historyMap.get(normalizedWorkspace) || []
+      console.log(`[claude-monitor] Found ${workspaceHistory.length} history entries for this workspace`)
       const mostRecentEntry = workspaceHistory[workspaceHistory.length - 1]
 
       // Get git info
