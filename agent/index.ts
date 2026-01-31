@@ -19,6 +19,8 @@ async function reportSessions() {
     // Get local sessions
     const sessions = await getActiveSessions()
 
+    console.log(`[${new Date().toISOString()}] Found ${sessions.length} local session(s)`)
+
     // Add machine name to each session
     const sessionsWithMachine = sessions.map(s => ({
       ...s,
@@ -39,7 +41,7 @@ async function reportSessions() {
     }
 
     const result = await response.json()
-    console.log(`[${new Date().toISOString()}] Reported ${result.received} session(s)`)
+    console.log(`[${new Date().toISOString()}] Successfully reported ${result.received} session(s) to server`)
   } catch (error) {
     console.error(`[${new Date().toISOString()}] Error reporting sessions:`, error instanceof Error ? error.message : error)
   }
