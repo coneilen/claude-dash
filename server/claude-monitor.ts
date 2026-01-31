@@ -61,6 +61,9 @@ export async function getActiveSessions(): Promise<LocalSession[]> {
       const workspaceHistory = historyMap.get(normalizedWorkspace) || []
       console.log(`[claude-monitor] Found ${workspaceHistory.length} history entries for this workspace`)
       const mostRecentEntry = workspaceHistory[workspaceHistory.length - 1]
+      if (mostRecentEntry) {
+        console.log(`[claude-monitor] Most recent entry title: "${mostRecentEntry.display.substring(0, 50)}"`)
+      }
 
       // Get git info
       const gitInfo = await getGitInfo(workspaceFolder)
