@@ -1,6 +1,7 @@
 import * as fs from 'fs'
 import * as path from 'path'
 import * as os from 'os'
+import { execSync } from 'child_process'
 import { LocalSession, LockFile, HistoryEntry } from './types.js'
 import { getGitInfo } from './git-info.js'
 
@@ -136,7 +137,6 @@ function isProcessRunning(pid: number): boolean {
   try {
     if (process.platform === 'win32') {
       // On Windows, use tasklist to check if process exists
-      const { execSync } = require('child_process')
       const output = execSync(`tasklist /FI "PID eq ${pid}" /NH`, { encoding: 'utf-8' })
       console.log(`[claude-monitor] Process check for PID ${pid}:`, output.trim().substring(0, 60))
       const isRunning = output.toLowerCase().includes('node') || output.toLowerCase().includes('code')
