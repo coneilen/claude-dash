@@ -9,6 +9,11 @@ const IDE_DIR = path.join(CLAUDE_DIR, 'ide')
 const HISTORY_FILE = path.join(CLAUDE_DIR, 'history.jsonl')
 const DEBUG_DIR = path.join(CLAUDE_DIR, 'debug')
 
+// Normalize path for case-insensitive comparison on Windows
+function normalizePath(p: string): string {
+  return process.platform === 'win32' ? p.toLowerCase() : p
+}
+
 interface SessionMap {
   [authToken: string]: {
     lockFile: LockFile
@@ -43,7 +48,9 @@ export async function getActiveSessions(): Promise<LocalSession[]> {
       const { lockFile, workspaceFolder } = sessionData
 
       // Find the most recent history entry for this workspace
-      const workspaceHistory = historyMap.get(workspaceFolder) || []
+      // Use normalized path for case-insensitive lookup on Windows
+      const normalizedWorkspace = normalizePath(workspaceFolder)
+      const workspaceHistory = historyMap.get(normalizedWorkspace) || []
       const mostRecentEntry = workspaceHistory[workspaceHistory.length - 1]
 
       // Get git info
@@ -151,11 +158,14 @@ async function readHistory(): Promise<Map<string, HistoryEntry[]>> {
       try {
         const entry: HistoryEntry = JSON.parse(line)
 
-        if (!historyMap.has(entry.project)) {
-          historyMap.set(entry.project, [])
+        // Normalize path for case-insensitive comparison on Windows
+        const normalizedProject = normalizePath(entry.project)
+
+        if (!historyMap.has(normalizedProject)) {
+          historyMap.set(normalizedProject, [])
         }
 
-        historyMap.get(entry.project)!.push(entry)
+        historyMap.get(normalizedProject)!.push(entry)
       } catch (e) {
         // Skip malformed lines
       }
