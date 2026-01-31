@@ -8,6 +8,7 @@
     "dev:server": "tsx watch server/index.ts",
     "dev:all": "concurrently \"npm run dev\" \"npm run dev:server\"",
     "agent": "tsx agent/index.ts",
+    "debug-agent": "node scripts/debug-agent.cjs",
     "server-ip": "node scripts/get-server-ip.cjs",
     "build": "tsc && vite build",
     "build:server": "tsc --project tsconfig.server.json",
